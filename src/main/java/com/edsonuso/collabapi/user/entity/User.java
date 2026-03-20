@@ -1,10 +1,11 @@
 package com.edsonuso.collabapi.user.entity;
 
 import com.edsonuso.collabapi.common.entity.BaseEntity;
+import com.edsonuso.collabapi.user.entity.UserSpecialization;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -41,6 +42,12 @@ public class User extends BaseEntity {
     @Column(name = "provider_id")
     private String providerId;
 
+    @Column(name = "username", nullable = false)
+    private String username;
+
+    @Column(name = "headline", length = 150)
+    private String headline;
+
     @Column(name = "email_verified", nullable = false)
     @Builder.Default
     private boolean emailVerified = false;
@@ -53,6 +60,23 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<UserSpecialization> specializations = new LinkedHashSet<>();
+
+    public List<Specialization> getSpecializationList() {
+        return specializations.stream()
+                .map(UserSpecialization::getSpecialization)
+                .toList();
+    }
+
+    public Optional<Specialization> getPrimarySpecialization() {
+        return specializations.stream()
+                .filter(UserSpecialization::isPrimary)
+                .map(UserSpecialization::getSpecialization)
+                .findFirst();
+    }
 
     // ── Lifecycle ──
 

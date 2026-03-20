@@ -113,7 +113,7 @@ public class AuthService {
                 user.getDisplayName()
         );
 
-        log.info("buildando acess token com valor de display name {} para usuario {}",
+        log.debug("buildando acess token com valor de display name {} para usuario {}",
                 user.getAuthProvider(),
                 user);
 
