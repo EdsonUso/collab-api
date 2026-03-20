@@ -97,7 +97,6 @@ public class SecurityConfig {
                         })
                 )
 
-                // ── JWT Filter ANTES do UsernamePasswordAuthenticationFilter ──
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

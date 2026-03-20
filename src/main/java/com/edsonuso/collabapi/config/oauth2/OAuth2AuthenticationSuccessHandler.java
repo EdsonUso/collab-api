@@ -41,7 +41,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     ) throws IOException {
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        log.info("objeto de autenticação OAuth2 {}", oAuth2User);
 
         Long userId = oAuth2User.getAttribute("collab_user_id");
         String displayName = oAuth2User.getAttribute("collab_display_name");
@@ -53,7 +52,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String rawRefreshToken = jwtService.generateRefreshToken();
 
-        // getReferenceById cria um proxy sem precisar de query — só precisa do ID para o FK
         User userRef = userRepository.getReferenceById(userId);
         RefreshToken refreshTokenEntity = RefreshToken.builder()
                 .tokenHash(jwtService.hashToken(rawRefreshToken))
