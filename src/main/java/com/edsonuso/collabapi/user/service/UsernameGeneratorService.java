@@ -17,12 +17,20 @@ public class UsernameGeneratorService {
     private final Set<String> reservedNames = Set.of("admin", "api", "settings", "login", "register", "collab");
 
     public String generate(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email cannot e null or blank");
+        }
+
         String lowerUsername = email.toLowerCase().split("@")[0];
         String validUsername = Normalizer.normalize(lowerUsername, Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
                 .replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
 
-        log.debug(validUsername);
+        if (validUsername.isBlank()) {
+            validUsername = "user";
+        }
+
+        log.debug("Base username generated: {}", validUsername);
         String candidate = validUsername;
 
         int suffix = 1;
@@ -31,6 +39,8 @@ public class UsernameGeneratorService {
             candidate = validUsername + suffix;
             suffix++;
         }
+
+
 
         return candidate;
     }
