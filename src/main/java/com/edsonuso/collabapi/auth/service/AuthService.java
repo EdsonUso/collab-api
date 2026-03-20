@@ -7,6 +7,7 @@ import com.edsonuso.collabapi.common.exception.BusinessException;
 import com.edsonuso.collabapi.config.security.JwtService;
 import com.edsonuso.collabapi.user.entity.User;
 import com.edsonuso.collabapi.user.repository.UserRepository;
+import com.edsonuso.collabapi.user.service.UsernameGeneratorService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final UsernameGeneratorService usernameGeneratorService;
 
     @Transactional
     public AuthDtos.AuthResponse register(AuthDtos.RegisterRequest request) {
@@ -35,6 +37,7 @@ public class AuthService {
                 .displayName(request.displayName())
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password()))
+                .username(usernameGeneratorService.generate(request.email()))
                 .build();
 
         user = userRepository.save(user);

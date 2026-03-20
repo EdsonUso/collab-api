@@ -3,6 +3,7 @@ package com.edsonuso.collabapi.config.oauth2;
 import com.edsonuso.collabapi.user.entity.AuthProvider;
 import com.edsonuso.collabapi.user.entity.User;
 import com.edsonuso.collabapi.user.repository.UserRepository;
+import com.edsonuso.collabapi.user.service.UsernameGeneratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
@@ -22,6 +23,7 @@ import java.util.Optional;
 public class CustomOidcUserService extends OidcUserService {
 
     private final UserRepository userRepository;
+    private final UsernameGeneratorService usernameGeneratorService;
 
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
@@ -102,6 +104,7 @@ public class CustomOidcUserService extends OidcUserService {
                 .displayName(displayName)
                 .avatarUrl(userInfo.avatarUrl())
                 .authProvider(provider)
+                .username(usernameGeneratorService.generate(email))
                 .providerId(providerId)
                 .emailVerified(true)
                 .build();
