@@ -42,7 +42,8 @@ public final class AuthDtos {
             String acessToken,
             String refreshToken,
             long expiresIn,
-            UserSummary user
+            UserSummary user,
+            String onboardingStep // nullable se completed
     ) {}
 
     public record UserSummary (

@@ -56,7 +56,7 @@ public class AuthService {
 
         onboarding = userOnboardingRepository.save(onboarding);
 
-        return buildAuthResponse(user);
+        return buildAuthResponse(user, onboarding.getCurrentStep().toString());
     }
 
     @Transactional
@@ -121,7 +121,7 @@ public class AuthService {
         log.info("Logout: todos os refresh tokens revogados para publicId={}", publicId);
     }
 
-    private AuthDtos.AuthResponse buildAuthResponse(User user) {
+    private AuthDtos.AuthResponse buildAuthResponse(User user, String onboardingStep) {
         String accessToken = jwtService.generateAccessToken(
                 user.getPublicId(),
                 user.getEmail(),
@@ -129,7 +129,7 @@ public class AuthService {
                 user.getDisplayName()
         );
 
-        log.debug("Gerando access token para publicId={}", user.getPublicId());
+
 
         String rawRefreshToken = jwtService.generateRefreshToken();
         RefreshToken refreshTokenEntity = RefreshToken.builder()
@@ -151,7 +151,21 @@ public class AuthService {
                 accessToken,
                 rawRefreshToken,
                 accessTokenExpirationMs / 1000,
-                userSummary
+                userSummary,
+                onboardingStep
         );
     }
+
+    private AuthDtos.AuthResponse buildAuthResponse(User user) {
+        String onboardingStep =  userOnboardingRepository.findByUser_PublicId(user.getPublicId())
+                .filter(ob -> ob.getCompletedAt() == null) //filtra os que getCompletedAt for null
+                .map(ob -> ob.getCurrentStep().name()) //mapeia (transforma) o objet no nome do Step (String)
+                .orElse(null);
+
+        log.debug("Gerando access token para publicId={}", user.getPublicId());
+
+        return buildAuthResponse(user, onboardingStep);
+    }
+
+
 }
