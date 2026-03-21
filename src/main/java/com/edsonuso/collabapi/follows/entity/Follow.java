@@ -1,9 +1,10 @@
 package com.edsonuso.collabapi.follows.entity;
 
 import com.edsonuso.collabapi.user.entity.User;
-import com.fasterxml.jackson.databind.node.LongNode;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
 
 @Entity
 @AllArgsConstructor
@@ -23,12 +24,18 @@ public class Follow {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @MapsId("followerId")
-    @JoinColumn(name = "follower_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "follower_id", nullable = false)
     private User follower;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "followable_type", nullable = false, columnDefinition = "ENUM('USER', 'SQUAD', 'GAME')")
     private FollowableType followableType;
+
+    @Column(name = "followable_id", nullable = false)
+    private Long followableId;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private Instant createdAt;
 
 }

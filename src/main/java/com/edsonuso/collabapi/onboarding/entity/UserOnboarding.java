@@ -1,5 +1,6 @@
-package com.edsonuso.collabapi.user.entity;
+package com.edsonuso.collabapi.onboarding.entity;
 
+import com.edsonuso.collabapi.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +28,7 @@ public class UserOnboarding {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Builder.Default
@@ -54,10 +56,10 @@ public class UserOnboarding {
     @Column(name = "follows_completed_at")
     private Instant followsCompletedAt;
 
-    @Column(name = "completed_at")
+    @Column(name = "completed_at", insertable = false, updatable = false)
     private Instant completedAt;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", insertable = false, updatable = false)
     @Builder.Default
     private Instant createdAt = Instant.now();
 

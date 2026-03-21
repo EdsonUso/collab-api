@@ -25,11 +25,11 @@ public class ContentCategories {
     private String slug;
 
     @Column(name = "icon_slug", length = 50)
-    private String slug_icon;
+    private String slugIcon;
 
     @Builder.Default
     @Column(name = "display_order", nullable = false)
-    private int display_order = 0;
+    private int displayOrder = 0;
 
     @Builder.Default
     @Column(name = "active", nullable = false)

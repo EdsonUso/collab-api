@@ -29,7 +29,6 @@ public class Squad {
     @Column(name = "slug", nullable = false, length = 100)
     private String slug;
 
-    @Lob
     @Column(name = "description")
     private String description;
 

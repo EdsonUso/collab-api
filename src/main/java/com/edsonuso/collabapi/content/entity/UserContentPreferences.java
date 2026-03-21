@@ -21,7 +21,7 @@ public class UserContentPreferences {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("categoryId")

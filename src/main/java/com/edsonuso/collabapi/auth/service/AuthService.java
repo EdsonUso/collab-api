@@ -5,6 +5,8 @@ import com.edsonuso.collabapi.auth.entity.RefreshToken;
 import com.edsonuso.collabapi.auth.repository.RefreshTokenRepository;
 import com.edsonuso.collabapi.common.exception.BusinessException;
 import com.edsonuso.collabapi.config.security.JwtService;
+import com.edsonuso.collabapi.onboarding.entity.UserOnboarding;
+import com.edsonuso.collabapi.onboarding.repository.UserOnboardingRepository;
 import com.edsonuso.collabapi.user.entity.User;
 import com.edsonuso.collabapi.user.repository.UserRepository;
 import com.edsonuso.collabapi.user.service.UsernameGeneratorService;
@@ -27,6 +29,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final UsernameGeneratorService usernameGeneratorService;
+    private final UserOnboardingRepository userOnboardingRepository;
 
     @Value("${app.jwt.access-token-expiration-ms}")
     private long accessTokenExpirationMs;
@@ -45,7 +48,13 @@ public class AuthService {
                 .build();
 
         user = userRepository.save(user);
-        log.info("Novo usuario registrado: publicId={}", user.getPublicId());
+
+        UserOnboarding onboarding = UserOnboarding.builder()
+                .currentStep(UserOnboarding.OnboardingStep.PROFILE)
+                .user(user)
+                .build();
+
+        onboarding = userOnboardingRepository.save(onboarding);
 
         return buildAuthResponse(user);
     }

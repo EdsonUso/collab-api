@@ -40,12 +40,12 @@ public class Game {
     @Column(name = "cover_url", length = 500)
     private String coverUrl;
 
-    @MapsId("squadId")
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "squad_id")
     private Squad squad;
 
-    @MapsId("creatorId")
-    @JoinColumn(name = "creator_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
     @Builder.Default

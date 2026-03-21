@@ -1,5 +1,7 @@
 package com.edsonuso.collabapi.config.oauth2;
 
+import com.edsonuso.collabapi.onboarding.entity.UserOnboarding;
+import com.edsonuso.collabapi.onboarding.repository.UserOnboardingRepository;
 import com.edsonuso.collabapi.user.entity.AuthProvider;
 import com.edsonuso.collabapi.user.entity.User;
 import com.edsonuso.collabapi.user.repository.UserRepository;
@@ -8,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -18,7 +21,9 @@ public class OAuth2UserProcessingService {
 
     private final UserRepository userRepository;
     private final UsernameGeneratorService usernameGeneratorService;
+    private final UserOnboardingRepository userOnboardingRepository;
 
+    @Transactional
     public User process(OAuth2UserInfo userInfo) {
         AuthProvider provider = userInfo.provider();
         String providerId = userInfo.id();
@@ -74,7 +79,16 @@ public class OAuth2UserProcessingService {
                 .emailVerified(true)
                 .build();
 
-        return userRepository.saveAndFlush(newUser);
+        User savedUser = userRepository.saveAndFlush(newUser);
+
+        UserOnboarding onboarding = UserOnboarding.builder()
+                .currentStep(UserOnboarding.OnboardingStep.PROFILE)
+                .user(savedUser)
+                .build();
+
+        userOnboardingRepository.save(onboarding);
+
+        return savedUser;
     }
 
     private User updateExistingUser(User user, OAuth2UserInfo userInfo) {
