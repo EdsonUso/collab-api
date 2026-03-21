@@ -9,6 +9,7 @@ import com.edsonuso.collabapi.user.entity.User;
 import com.edsonuso.collabapi.user.repository.UserRepository;
 import com.edsonuso.collabapi.user.service.UsernameGeneratorService;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,9 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final UsernameGeneratorService usernameGeneratorService;
+
+    @Value("${app.jwt.access-token-expiration-ms}")
+    private long accessTokenExpirationMs;
 
     @Transactional
     public AuthDtos.AuthResponse register(AuthDtos.RegisterRequest request) {
@@ -116,9 +120,7 @@ public class AuthService {
                 user.getDisplayName()
         );
 
-        log.debug("buildando acess token com valor de display name {} para usuario {}",
-                user.getAuthProvider(),
-                user);
+        log.debug("Gerando access token para publicId={}", user.getPublicId());
 
         String rawRefreshToken = jwtService.generateRefreshToken();
         RefreshToken refreshTokenEntity = RefreshToken.builder()
@@ -139,7 +141,7 @@ public class AuthService {
         return new AuthDtos.AuthResponse(
                 accessToken,
                 rawRefreshToken,
-                900,
+                accessTokenExpirationMs / 1000,
                 userSummary
         );
     }

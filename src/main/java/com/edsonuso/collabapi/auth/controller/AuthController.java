@@ -48,6 +48,15 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
+    @PostMapping("/refresh")
+    @Operation(summary = "Renovar access token")
+    public ResponseEntity<ApiResponse<AuthDtos.AuthResponse>> refresh(
+            @Valid @RequestBody AuthDtos.RefreshTokenRequest request
+    ) {
+        AuthDtos.AuthResponse response = authService.refresh(request);
+        return ResponseEntity.ok(ApiResponse.ok(response));
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
             @AuthenticationPrincipal    AuthenticatedUser principal
