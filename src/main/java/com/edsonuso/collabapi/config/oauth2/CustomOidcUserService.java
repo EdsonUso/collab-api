@@ -51,6 +51,7 @@ public class CustomOidcUserService extends OidcUserService {
         enriched.put("collab_public_id", user.getPublicId());
         enriched.put("collab_email", user.getEmail());
         enriched.put("collab_role", user.getRole().name());
+        enriched.put("collab_onboarding_step", processingService.getOnboardingStep(user));
         return enriched;
     }
 }

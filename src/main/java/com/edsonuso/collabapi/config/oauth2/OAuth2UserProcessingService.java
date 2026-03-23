@@ -91,6 +91,13 @@ public class OAuth2UserProcessingService {
         return savedUser;
     }
 
+    public String getOnboardingStep(User user) {
+        return userOnboardingRepository.findByUser_PublicId(user.getPublicId())
+                .filter(ob -> ob.getCompletedAt() == null)
+                .map(ob -> ob.getCurrentStep().name())
+                .orElse(null);
+    }
+
     private User updateExistingUser(User user, OAuth2UserInfo userInfo) {
         if (userInfo.avatarUrl() != null && !userInfo.avatarUrl().equals(user.getAvatarUrl())) {
             user.setAvatarUrl(userInfo.avatarUrl());

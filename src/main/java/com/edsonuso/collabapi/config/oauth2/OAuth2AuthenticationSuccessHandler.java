@@ -47,6 +47,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String publicId = oAuth2User.getAttribute("collab_public_id");
         String email = oAuth2User.getAttribute("collab_email");
         String role = oAuth2User.getAttribute("collab_role");
+        String onboardingStep = oAuth2User.getAttribute("collab_onboarding_step");
 
         String accessToken = jwtService.generateAccessToken(publicId, email, role, displayName);
 
@@ -63,6 +64,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String redirectUrl = UriComponentsBuilder.fromUriString(frontendRedirectUri)
                 .queryParam("token", accessToken)
                 .queryParam("refresh_token", rawRefreshToken)
+                .queryParam("onboarding_step", onboardingStep)
                 .build()
                 .toUriString();
 
