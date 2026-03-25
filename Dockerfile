@@ -1,7 +1,14 @@
-FROM ubuntu:24.04
+FROM eclipse-temurin:21-jre-alpine
 LABEL authors="Edson Cruz"
 
-RUN useradd -m -u 10001 appuser
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+WORKDIR /app
+
+COPY target/*.jar app.jar
+
+RUN chown -R appuser:appgroup /app
 USER appuser
 
-ENTRYPOINT ["top", "-b"]
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
