@@ -96,9 +96,4 @@ public class UserOnboardingCommands {
             List<FollowItem> follows
     ) {}
 
-    @Schema(description = "Resposta de verificação de disponibilidade de username")
-    public record UsernameAvailabilityResponse(
-            @Schema(description = "Indica se o username está disponível")
-            boolean available
-    ) {}
 }

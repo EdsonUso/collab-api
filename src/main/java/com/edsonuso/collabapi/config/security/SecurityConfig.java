@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/health").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/onboarding/check-username").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/check-username/**").permitAll()
 
                         .requestMatchers(
                                 "/v3/api-docs/**",

@@ -270,28 +270,6 @@ public class UserOnboardingService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public UserOnboardingCommands.UsernameAvailabilityResponse checkUsernameAvailability(String username, String authenticatedPublicId) {
-        String regex = "^[a-z0-9]([a-z0-9]{0,28}[a-z0-9])?$";
-        if (username == null || !username.matches(regex) || username.length() < 2 || username.length() > 30) {
-            throw new BusinessException("Formato de username inválido", HttpStatus.BAD_REQUEST);
-        }
-
-        if (generatorService.isReservedName(username)) {
-            return new UserOnboardingCommands.UsernameAvailabilityResponse(false);
-        }
-
-        if (authenticatedPublicId != null) {
-            boolean takenByOther = userRepository.findByUsername(username)
-                    .map(u -> !u.getPublicId().equals(authenticatedPublicId))
-                    .orElse(false);
-            return new UserOnboardingCommands.UsernameAvailabilityResponse(!takenByOther);
-        }
-
-        boolean exists = userRepository.existsByUsername(username);
-        return new UserOnboardingCommands.UsernameAvailabilityResponse(!exists);
-    }
-
     private User findUserByPublicId(String publicId) {
         return userRepository.findByPublicId(publicId)
                 .orElseThrow(() -> new BusinessException("Usuario não encontrado", HttpStatus.NOT_FOUND));

@@ -78,13 +78,4 @@ public class UserOnboardingController {
         return ResponseEntity.ok(ApiResponse.ok(onboardingService.skipCurrentStep(user.publicId())));
     }
 
-    @GetMapping("/check-username")
-    @Operation(summary = "Verificar disponibilidade de username")
-    public ResponseEntity<ApiResponse<UserOnboardingCommands.UsernameAvailabilityResponse>> checkUsername(
-            @RequestParam String username,
-            @Parameter(hidden = true) @AuthenticationPrincipal(errorOnInvalidType = false) AuthenticatedUser user
-    ) {
-        String publicId = user != null ? user.publicId() : null;
-        return ResponseEntity.ok(ApiResponse.ok(onboardingService.checkUsernameAvailability(username, publicId)));
-    }
 }
