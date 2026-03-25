@@ -1,7 +1,8 @@
 package com.edsonuso.collabapi.user.entity;
 
 import com.edsonuso.collabapi.common.entity.BaseEntity;
-import com.edsonuso.collabapi.user.entity.UserSpecialization;
+import com.edsonuso.collabapi.specialization.entity.Specialization;
+import com.edsonuso.collabapi.specialization.entity.UserSpecialization;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +23,7 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @ToString.Exclude
     @Column(name = "password_hash")
     private String passwordHash;
 

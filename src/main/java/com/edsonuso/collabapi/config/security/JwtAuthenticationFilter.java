@@ -1,5 +1,6 @@
 package com.edsonuso.collabapi.config.security;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.flywaydb.core.internal.util.StringUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,5 +71,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * Record imutável que fica no SecurityContext como principal.
      * Qualquer controller pode extrair via @AuthenticationPrincipal.
      */
-    public record AuthenticatedUser(String publicId, String email, String role, String displayName) {}
+    @Schema(description = "Dados do usuário autenticado extraídos do token JWT")
+    public record AuthenticatedUser(
+            @Schema(description = "ID público do usuário")
+            String publicId,
+            @Schema(description = "Email do usuário")
+            String email,
+            @Schema(description = "Role do usuário")
+            String role,
+            @Schema(description = "Nome de exibição")
+            String displayName
+    ) {}
 }

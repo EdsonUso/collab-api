@@ -5,10 +5,13 @@ import com.edsonuso.collabapi.auth.entity.RefreshToken;
 import com.edsonuso.collabapi.auth.repository.RefreshTokenRepository;
 import com.edsonuso.collabapi.common.exception.BusinessException;
 import com.edsonuso.collabapi.config.security.JwtService;
+import com.edsonuso.collabapi.onboarding.entity.UserOnboarding;
+import com.edsonuso.collabapi.onboarding.repository.UserOnboardingRepository;
 import com.edsonuso.collabapi.user.entity.User;
 import com.edsonuso.collabapi.user.repository.UserRepository;
 import com.edsonuso.collabapi.user.service.UsernameGeneratorService;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,10 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final UsernameGeneratorService usernameGeneratorService;
+    private final UserOnboardingRepository userOnboardingRepository;
+
+    @Value("${app.jwt.access-token-expiration-ms}")
+    private long accessTokenExpirationMs;
 
     @Transactional
     public AuthDtos.AuthResponse register(AuthDtos.RegisterRequest request) {
@@ -41,9 +48,15 @@ public class AuthService {
                 .build();
 
         user = userRepository.save(user);
-        log.info("Novo usuario registrado: publicId={}", user.getPublicId());
 
-        return buildAuthResponse(user);
+        UserOnboarding onboarding = UserOnboarding.builder()
+                .currentStep(UserOnboarding.OnboardingStep.PROFILE)
+                .user(user)
+                .build();
+
+        onboarding = userOnboardingRepository.save(onboarding);
+
+        return buildAuthResponse(user, onboarding.getCurrentStep().toString());
     }
 
     @Transactional
@@ -108,7 +121,7 @@ public class AuthService {
         log.info("Logout: todos os refresh tokens revogados para publicId={}", publicId);
     }
 
-    private AuthDtos.AuthResponse buildAuthResponse(User user) {
+    private AuthDtos.AuthResponse buildAuthResponse(User user, String onboardingStep) {
         String accessToken = jwtService.generateAccessToken(
                 user.getPublicId(),
                 user.getEmail(),
@@ -116,9 +129,7 @@ public class AuthService {
                 user.getDisplayName()
         );
 
-        log.debug("buildando acess token com valor de display name {} para usuario {}",
-                user.getAuthProvider(),
-                user);
+
 
         String rawRefreshToken = jwtService.generateRefreshToken();
         RefreshToken refreshTokenEntity = RefreshToken.builder()
@@ -139,8 +150,22 @@ public class AuthService {
         return new AuthDtos.AuthResponse(
                 accessToken,
                 rawRefreshToken,
-                900,
-                userSummary
+                accessTokenExpirationMs / 1000,
+                userSummary,
+                onboardingStep
         );
     }
+
+    private AuthDtos.AuthResponse buildAuthResponse(User user) {
+        String onboardingStep = userOnboardingRepository.findById(user.getId())
+                .filter(ob -> ob.getCompletedAt() == null)
+                .map(ob -> ob.getCurrentStep().name())
+                .orElse(null);
+
+        log.debug("Gerando access token para publicId={}", user.getPublicId());
+
+        return buildAuthResponse(user, onboardingStep);
+    }
+
+
 }

@@ -39,9 +39,10 @@ public class UsernameGeneratorService {
             candidate = validUsername + suffix;
             suffix++;
         }
-
-
-
         return candidate;
+    }
+
+    public boolean isReservedName(String candidate) {
+        return reservedNames.contains(candidate);
     }
 }
