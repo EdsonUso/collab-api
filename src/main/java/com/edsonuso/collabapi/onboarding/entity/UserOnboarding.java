@@ -56,7 +56,7 @@ public class UserOnboarding {
     @Column(name = "follows_completed_at")
     private Instant followsCompletedAt;
 
-    @Column(name = "completed_at", insertable = false, updatable = false)
+    @Column(name = "completed_at")
     private Instant completedAt;
 
     @Column(name = "created_at", insertable = false, updatable = false)

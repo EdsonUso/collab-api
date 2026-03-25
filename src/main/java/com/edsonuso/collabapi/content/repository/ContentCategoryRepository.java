@@ -8,5 +8,5 @@ import java.util.List;
 public interface ContentCategoryRepository extends JpaRepository<ContentCategories, Long> {
     List<ContentCategories> findAllByActiveTrue();
     List<ContentCategories> findAllByActiveOrderByDisplayOrder(boolean active);
-
+    long countByIdInAndActiveTrue(List<Long> ids);
 }

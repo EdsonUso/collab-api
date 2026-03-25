@@ -157,9 +157,9 @@ public class AuthService {
     }
 
     private AuthDtos.AuthResponse buildAuthResponse(User user) {
-        String onboardingStep =  userOnboardingRepository.findByUser_PublicId(user.getPublicId())
-                .filter(ob -> ob.getCompletedAt() == null) //filtra os que getCompletedAt for null
-                .map(ob -> ob.getCurrentStep().name()) //mapeia (transforma) o objet no nome do Step (String)
+        String onboardingStep = userOnboardingRepository.findById(user.getId())
+                .filter(ob -> ob.getCompletedAt() == null)
+                .map(ob -> ob.getCurrentStep().name())
                 .orElse(null);
 
         log.debug("Gerando access token para publicId={}", user.getPublicId());

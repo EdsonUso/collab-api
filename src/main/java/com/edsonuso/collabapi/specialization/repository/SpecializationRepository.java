@@ -16,4 +16,6 @@ public interface SpecializationRepository extends JpaRepository<Specialization, 
 
     List<Specialization> findByActiveTrueOrderByDisplayOrderAsc();
 
+    long countByIdIn(List<Short> ids);
+
 }

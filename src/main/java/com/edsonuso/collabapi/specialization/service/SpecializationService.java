@@ -30,8 +30,6 @@ public class SpecializationService {
     private final UserSpecializationRepository userSpecializationRepository;
     private final UserRepository userRepository;
 
-    // ── Catálogo (público) ──
-
     @Transactional(readOnly = true)
     public List<SpecializationCommands.SpecializationResponse> listAll() {
         return specializationRepository.findByActiveTrueOrderByDisplayOrderAsc().stream()
@@ -39,7 +37,6 @@ public class SpecializationService {
                 .toList();
     }
 
-    // ── Especializações do usuário ──
 
     @Transactional(readOnly = true)
     public List<SpecializationCommands.UserSpecializationResponse> getUserSpecializations(String publicId) {
@@ -55,10 +52,6 @@ public class SpecializationService {
                 .toList();
     }
 
-    /**
-     * Atualiza as especializações do usuário (replace completo).
-     * Deleta as existentes e insere as novas — simples e seguro.
-     */
     @Transactional
     public List<SpecializationCommands.UserSpecializationResponse> updateUserSpecializations(
             String publicId,
@@ -66,7 +59,6 @@ public class SpecializationService {
     ) {
         User user = findUserByPublicId(publicId);
 
-        // Valida que todos os slugs existem
         List<Specialization> specs = specializationRepository.findBySlugInAndActiveTrue(request.slugs());
 
         if (specs.size() != request.slugs().size()) {
@@ -80,18 +72,14 @@ public class SpecializationService {
             );
         }
 
-        // Valida primarySlug
         if (request.primarySlug() != null && !request.slugs().contains(request.primarySlug())) {
             throw new BusinessException(
                     "A especialização primária deve estar na lista de especializações selecionadas",
                     HttpStatus.UNPROCESSABLE_ENTITY
             );
         }
-
-        // Remove existentes
         userSpecializationRepository.deleteAllByUserId(user.getId());
 
-        // Insere novas
         Map<String, Specialization> specMap = specs.stream()
                 .collect(Collectors.toMap(Specialization::getSlug, Function.identity()));
 
@@ -121,8 +109,6 @@ public class SpecializationService {
                 .toList();
     }
 
-    // ── Queries para outros módulos (feed, colaboração) ──
-
     @Transactional(readOnly = true)
     public List<String> findUsersBySpecialization(String slug) {
         return userSpecializationRepository.findUserPublicIdsBySpecializationSlug(slug);
@@ -133,8 +119,6 @@ public class SpecializationService {
         User user = findUserByPublicId(publicId);
         return userSpecializationRepository.findUsersWithSharedSpecializations(user.getId());
     }
-
-    // ── Helpers ──
 
     private User findUserByPublicId(String publicId) {
         return userRepository.findByPublicId(publicId)

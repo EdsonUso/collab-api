@@ -92,7 +92,7 @@ public class OAuth2UserProcessingService {
     }
 
     public String getOnboardingStep(User user) {
-        return userOnboardingRepository.findByUser_PublicId(user.getPublicId())
+        return userOnboardingRepository.findById(user.getId())
                 .filter(ob -> ob.getCompletedAt() == null)
                 .map(ob -> ob.getCurrentStep().name())
                 .orElse(null);
